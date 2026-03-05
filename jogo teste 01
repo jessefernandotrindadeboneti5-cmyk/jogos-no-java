@@ -1,0 +1,128 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class MiniMinecraft extends JPanel implements KeyListener, MouseListener {
+
+
+
+
+
+        int tile = 32;
+        int largura = 25;
+        int altura = 18;
+
+        int[][] mundo = new int[largura][altura];
+
+        int playerX = 5;
+        int playerY = 5;
+
+        public MiniMinecraft(){
+
+            setPreferredSize(new Dimension(largura * tile, altura * tile));
+            setFocusable(true);
+
+            addKeyListener(this);
+            addMouseListener(this);
+
+            gerarMundo();
+        }
+
+        void gerarMundo(){
+
+            for(int x = 0; x < largura; x++){
+
+                for(int y = 10; y < altura; y++){
+
+                    if(y == 10)
+                        mundo[x][y] = 2; // grama
+                    else
+                        mundo[x][y] = 1; // terra
+
+                }
+
+            }
+
+        }
+
+        public void paintComponent(Graphics g){
+
+            super.paintComponent(g);
+
+            for(int x = 0; x < largura; x++){
+                for(int y = 0; y < altura; y++){
+
+                    if(mundo[x][y] == 1){
+                        g.setColor(new Color(120,72,0));
+                        g.fillRect(x * tile, y * tile, tile, tile);
+                    }
+
+                    if(mundo[x][y] == 2){
+                        g.setColor(Color.GREEN);
+                        g.fillRect(x * tile, y * tile, tile, tile);
+                    }
+
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x * tile, y * tile, tile, tile);
+
+                }
+            }
+
+            g.setColor(Color.BLUE);
+            g.fillRect(playerX * tile, playerY * tile, tile, tile);
+
+        }
+
+        public void keyPressed(KeyEvent e){
+
+            int k = e.getKeyCode();
+
+            if(k == KeyEvent.VK_LEFT) playerX--;
+            if(k == KeyEvent.VK_RIGHT) playerX++;
+            if(k == KeyEvent.VK_UP) playerY--;
+            if(k == KeyEvent.VK_DOWN) playerY++;
+
+            repaint();
+        }
+
+        public void mousePressed(MouseEvent e){
+
+            int x = e.getX() / tile;
+            int y = e.getY() / tile;
+
+            if(x >= 0 && x < largura && y >= 0 && y < altura){
+
+                if(SwingUtilities.isLeftMouseButton(e))
+                    mundo[x][y] = 0;
+
+                if(SwingUtilities.isRightMouseButton(e))
+                    mundo[x][y] = 1;
+
+            }
+
+            repaint();
+        }
+
+        public void keyReleased(KeyEvent e){}
+        public void keyTyped(KeyEvent e){}
+
+        public void mouseClicked(MouseEvent e){}
+        public void mouseReleased(MouseEvent e){}
+        public void mouseEntered(MouseEvent e){}
+        public void mouseExited(MouseEvent e){}
+
+        public static void main(String[] args){
+
+            JFrame janela = new JFrame("Minecraft 2D");
+
+            MiniMinecraft jogo = new MiniMinecraft();
+
+            janela.add(jogo);
+            janela.pack();
+
+            janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            janela.setLocationRelativeTo(null);
+            janela.setVisible(true);
+
+        }
+    }

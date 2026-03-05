@@ -1,0 +1,161 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.HashMap;
+
+public class Minecraft2D extends JPanel implements KeyListener, MouseListener {
+
+    int tile = 32;
+    int larguraTela = 25;
+    int alturaTela = 18;
+
+    int playerX = 0;
+    int playerY = 5;
+
+    int blocoSelecionado = 1;
+
+    HashMap<String,Integer> blocos = new HashMap<>();
+
+    public Minecraft2D(){
+
+        setPreferredSize(new Dimension(larguraTela * tile, alturaTela * tile));
+
+        setFocusable(true);
+        addKeyListener(this);
+        addMouseListener(this);
+    }
+
+    int gerarTerreno(int x){
+
+        double altura = Math.sin(x * 0.2) * 2 + 10;
+
+        return (int)altura;
+    }
+
+    int getBloco(int x,int y){
+
+        String chave = x + "," + y;
+
+        if(blocos.containsKey(chave))
+            return blocos.get(chave);
+
+        int altura = gerarTerreno(x);
+
+        if(y == altura)
+            return 2;
+
+        if(y > altura && y < altura + 3)
+            return 1;
+
+        if(y >= altura + 3)
+            return 3;
+
+        return 0;
+    }
+
+    void setBloco(int x,int y,int tipo){
+
+        String chave = x + "," + y;
+
+        blocos.put(chave,tipo);
+    }
+
+    public void paintComponent(Graphics g){
+
+        super.paintComponent(g);
+
+        int inicioX = playerX - larguraTela/2;
+
+        for(int x = 0; x < larguraTela; x++){
+            for(int y = 0; y < alturaTela; y++){
+
+                int mundoX = inicioX + x;
+                int mundoY = y;
+
+                int bloco = getBloco(mundoX,mundoY);
+
+                if(bloco == 1){
+                    g.setColor(new Color(120,72,0));
+                    g.fillRect(x*tile,y*tile,tile,tile);
+                }
+
+                if(bloco == 2){
+                    g.setColor(Color.GREEN);
+                    g.fillRect(x*tile,y*tile,tile,tile);
+                }
+
+                if(bloco == 3){
+                    g.setColor(Color.GRAY);
+                    g.fillRect(x*tile,y*tile,tile,tile);
+                }
+
+                g.setColor(Color.BLACK);
+                g.drawRect(x*tile,y*tile,tile,tile);
+            }
+        }
+
+        g.setColor(Color.BLUE);
+
+        int telaPlayerX = larguraTela/2 * tile;
+
+        g.fillRect(telaPlayerX,playerY*tile,tile,tile);
+
+        g.setColor(Color.WHITE);
+        g.drawString("Bloco: " + blocoSelecionado,10,20);
+    }
+
+    public void keyPressed(KeyEvent e){
+
+        int k = e.getKeyCode();
+
+        if(k == KeyEvent.VK_LEFT) playerX--;
+        if(k == KeyEvent.VK_RIGHT) playerX++;
+
+        if(k == KeyEvent.VK_UP) playerY--;
+        if(k == KeyEvent.VK_DOWN) playerY++;
+
+        if(k == KeyEvent.VK_1) blocoSelecionado = 1;
+        if(k == KeyEvent.VK_2) blocoSelecionado = 2;
+        if(k == KeyEvent.VK_3) blocoSelecionado = 3;
+
+        repaint();
+    }
+
+    public void mousePressed(MouseEvent e){
+
+        int x = e.getX()/tile;
+        int y = e.getY()/tile;
+
+        int mundoX = playerX - larguraTela/2 + x;
+
+        if(SwingUtilities.isLeftMouseButton(e))
+            setBloco(mundoX,y,0);
+
+        if(SwingUtilities.isRightMouseButton(e))
+            setBloco(mundoX,y,blocoSelecionado);
+
+        repaint();
+    }
+
+    public void keyReleased(KeyEvent e){}
+    public void keyTyped(KeyEvent e){}
+
+    public void mouseClicked(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){}
+    public void mouseEntered(MouseEvent e){}
+    public void mouseExited(MouseEvent e){}
+
+    public static void main(String[] args){
+
+        JFrame janela = new JFrame("Minecraft 2D Infinito");
+
+        Minecraft2D jogo = new Minecraft2D();
+
+        janela.add(jogo);
+        janela.pack();
+
+        janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        janela.setLocationRelativeTo(null);
+        janela.setVisible(true);
+    }
+}
